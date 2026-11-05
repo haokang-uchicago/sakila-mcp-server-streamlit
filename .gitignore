@@ -1,0 +1,8 @@
+# 秘密：API key 只放在 env.sh 里，永远不进 git、不打包交作业
+env.sh
+.env
+.streamlit/secrets.toml
+# 本机环境和缓存
+.venv/
+__pycache__/
+.DS_Store
