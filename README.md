@@ -5,11 +5,10 @@
 Ask the Week 4 Sakila star schema (`SAKILA.DW`) a question in plain English and get an answer you can check.
 Two front doors share one set of four bounded tools:
 
-```
-Claude Code ──MCP──> server.py ──┐
-                                 ├──> tools.py ──> Snowflake (SAKILA.DW, read-only role)
-Streamlit app.py ──DeepSeek──────┘
-```
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/architecture-dark.png">
+  <img alt="Claude Code and a Streamlit app with DeepSeek call the same MCP server; four read-only tools query Snowflake SAKILA.DW through a SELECT-only role" src="assets/architecture-light.png" width="100%">
+</picture>
 
 - **`tools.py`** – the four tools. All SQL, argument checks and honesty notes live here.
 - **`server.py`** – the MCP server: registers the four tools (their docstrings are the descriptions the model reads) plus usage rules. Runs over stdio.
@@ -46,6 +45,10 @@ Next to every answer:
 - the app's own honesty checks, shown **above** the answer (see below);
 - a chart that follows the answer: one big number, a calendar-ordered bar chart (every month in the span keeps its slot, so a data gap is visible), or a ranked bar chart, plus the table behind it;
 - for each tool call, a one-line trace (tool · rows · what one row represents · seconds · estimated credits · result cache) and, one click away, the arguments the model chose, the SQL, its bound values and the cost breakdown.
+
+| The data gap shows as a gap, not a crash | A SQL-injection attempt is refused and flagged |
+|---|---|
+| <img src="assets/app-gap-chart.png" alt="Streamlit app: revenue by month with empty slots for 2005-09 to 2006-01"> | <img src="assets/app-sql-injection.png" alt="Streamlit app refusing a category value that contains DROP TABLE, with the app's own warnings above the answer"> |
 
 The app checks the answer against what actually ran, whatever the model claims:
 - **numbers with no source**: every amount in the answer must appear in this question's tool results (rounding allowed; years, dates and small counts ignored); if no query ran at all, any such number is flagged as coming from an earlier answer;
@@ -108,6 +111,11 @@ Start `claude` in this folder, approve the `sakila` server, and ask, for example
 
 Asked in the Streamlit app. Data covers 2005-05-24..2006-02-14 with **no payments 2005-09..2006-01**, which several tests lean on. Screenshots: `evidence/before/` and `evidence/after/`, paired by question number (each folder has an `INDEX.md`).
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/red-team-dark.png">
+  <img alt="Six adversarial questions, what failed on the first try, and the fix for each" src="assets/red-team-light.png" width="100%">
+</picture>
+
 | # | Question | What happened first | What changed |
 |---|---|---|---|
 | 1 | *How are we doing?* (vague) | Good text (states its reading, warns about the gap), but the chart **dropped the five empty months**, so it looked like a crash from August to February | Month axis fixed to every month in the span; empty months keep an empty slot |
@@ -135,6 +143,6 @@ The lesson: *a prompt changes what a model says more reliably than what it does*
 
 ## Context
 
-Built for **ADSP 31011 Cloud-Native Data Engineering** (UChicago MS in Applied Data Science, Autumn 2026), on top of the Week 4 star schema ([sakila-snowflake-star-schema](https://github.com/haokang-uchicago/sakila-snowflake-star-schema)). Private under the course's academic-integrity policy, shared on request. `.mcp.json` holds absolute paths from my machine; re-register the server with the `claude mcp add` command above.
+Built for **ADSP 31011 Cloud-Native Data Engineering** (UChicago MS in Applied Data Science, Autumn 2026), on top of the Week 4 star schema ([sakila-snowflake-star-schema](https://github.com/haokang-uchicago/sakila-snowflake-star-schema)). Published with the instructor's permission to showcase the work. `.mcp.json` holds absolute paths from my machine; re-register the server with the `claude mcp add` command above.
 
 **Hao Kang** · [LinkedIn](https://www.linkedin.com/in/hao-kang-6654b5331/) · [GitHub](https://github.com/haokang-uchicago)
